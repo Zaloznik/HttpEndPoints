@@ -18,106 +18,138 @@ namespace HttpEndPointsApi.Controllers
     public class DiffController : ControllerBase
     {
         [HttpPost("left")]
-        public IActionResult Left(int id, [FromBody] string data)
+        public IActionResult Left(Guid id, [FromBody] string data)
         {
             if (string.IsNullOrEmpty(data))
             {
                 return BadRequest();
             }
 
-            byte[] byteArray = Encoding.UTF8.GetBytes(data);
+            byte[] byteArray = Convert.FromBase64String(data);
 
-            Globals.leftData = byteArray;
+            if(Globals.ClientData != null && Globals.ClientData.Count > 0 && Globals.ClientData.Any(x => x.id == id))
+            {
+                var clientObj = Globals.ClientData.Where(x => x.id == id).FirstOrDefault();
+                clientObj.leftData = byteArray;
+            }
+            else
+            {
+                if(Globals.ClientData == null || Globals.ClientData.Count == 0)
+                {
+                    Globals.ClientData = new List<ClientObj>();
+                }
+                Globals.ClientData.Add(new ClientObj(id, byteArray, null));
+            }
+            //Globals.leftData = byteArray;
 
             return StatusCode(201);
         }
 
         [HttpPost("right")]
-        public IActionResult Right(int id, [FromBody] string data)
+        public IActionResult Right(Guid id, [FromBody] string data)
         {
             if (string.IsNullOrEmpty(data))
             {
                 return BadRequest();
             }
 
-            byte[] byteArray = Encoding.UTF8.GetBytes(data);
+            byte[] byteArray = Convert.FromBase64String(data);
 
-            Globals.rightData = byteArray;
+            if (Globals.ClientData != null && Globals.ClientData.Count > 0 && Globals.ClientData.Any(x => x.id == id))
+            {
+                var clientObj = Globals.ClientData.Where(x => x.id == id).FirstOrDefault();
+                clientObj.rightData = byteArray;
+            }
+            else
+            {
+                if (Globals.ClientData == null || Globals.ClientData.Count == 0)
+                {
+                    Globals.ClientData = new List<ClientObj>();
+                }
+                Globals.ClientData.Add(new ClientObj(id, null, byteArray));
+            }
 
             return StatusCode(201);
         }
 
         [HttpGet]
-        public IActionResult Diff(int id)
+        public IActionResult Diff(Guid id)
         {
-            if (Globals.leftData == null || Globals.leftData.Length == 0 || Globals.rightData == null || Globals.rightData.Length == 0)
+            if (Globals.ClientData == null || Globals.ClientData.Count == 0 || !Globals.ClientData.Any(x => x.id == id))
             {
                 return NotFound();
             }
 
-            if (Globals.leftData.Length == Globals.rightData.Length)
+            ClientObj obj = Globals.ClientData.Where(x => x.id == id).FirstOrDefault();
+            if(obj != null && obj.rightData != null && obj.rightData != null)
             {
-                bool same = true;
-                for (int i = 0; i < Globals.leftData.Length; i++)
+                if(obj.leftData.Length == obj.rightData.Length)
                 {
-                    if (Globals.leftData[i] != Globals.rightData[i])
+                    bool same = true;
+                    for (int i = 0; i < obj.leftData.Length; i++)
                     {
-                        same = false;
+                        if (obj.leftData[i] != obj.rightData[i])
+                        {
+                            same = false;
+                        }
                     }
-                }
-                if (same)
-                {
-                    var jsonData = new
+                    if (same)
                     {
-                        diffResultType = "Equals"
-                    };
+                        var jsonData = new
+                        {
+                            diffResultType = "Equals"
+                        };
 
-                    return Ok(jsonData);
+                        return Ok(jsonData);
+                    }
+                    else
+                    {
+                        DiffResult result = new DiffResult();
+                        result.DiffResultType = "ContentDoNotMatch";
+                        result.Diffs = new List<DiffDetail>();
+
+                        int offset = -1;
+                        int length = 0;
+                        for (int i = 0; i < obj.leftData.Length; i++)
+                        {
+                            if (obj.leftData[i] != obj.rightData[i])
+                            {
+                                if (offset == -1)
+                                {
+                                    offset = i;
+                                }
+                                length++;
+                            }
+                            else
+                            {
+                                if (offset != -1)
+                                {
+                                    result.Diffs.Add(new DiffDetail { Offset = offset, Length = length });
+                                    offset = -1;
+                                    length = 0;
+                                }
+                            }
+                        }
+
+                        if (offset != -1)
+                        {
+                            result.Diffs.Add(new DiffDetail { Offset = offset, Length = length });
+                        }
+                        return Ok(result);
+                    }
                 }
                 else
                 {
-                    DiffResult result = new DiffResult();
-                    result.DiffResultType = "ContentDoNotMatch";
-                    result.Diffs = new List<DiffDetail>();
-
-                    int offset = -1;
-                    int length = 0;
-                    for (int i = 0; i < Globals.leftData.Length; i++)
+                    var jsonData = new
                     {
-                        if (Globals.leftData[i] != Globals.rightData[i])
-                        {
-                            if (offset == -1)
-                            {
-                                offset = i;
-                            }
-                            length++;
-                        }
-                        else
-                        {
-                            if (offset != -1)
-                            {
-                                result.Diffs.Add(new DiffDetail { Offset = offset, Length = length });
-                                offset = -1;
-                                length = 0;
-                            }
-                        }
-                    }
-
-                    if (offset != -1)
-                    {
-                        result.Diffs.Add(new DiffDetail { Offset = offset, Length = length });
-                    }
-                    return Ok(result);
+                        diffResultType = "SizeDoNotMatch"
+                    };
+                    return Ok(jsonData);
                 }
-
             }
             else
             {
-                var jsonData = new
-                {
-                    diffResultType = "SizeDoNotMatch"
-                };
-                return Ok(jsonData);
+                return NotFound();
             }
         }
     }
