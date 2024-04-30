@@ -21,7 +21,7 @@ namespace diffTesterWFA
         {
             InitializeComponent();
             httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri("https://localhost:7265");
+            httpClient.BaseAddress = new Uri("https://localhost:5001");
             clientID = Guid.NewGuid();
         }
 
@@ -34,7 +34,6 @@ namespace diffTesterWFA
             StringContent leftContent = new StringContent($"\"{base64String}\"", Encoding.UTF8, "application/json");
 
             var leftResponse = await httpClient.PostAsync("/v1/diff/" + clientID + "/left", leftContent);
-
             int statusCode = (int)leftResponse.StatusCode;
             string message = string.Empty;
             switch (statusCode)

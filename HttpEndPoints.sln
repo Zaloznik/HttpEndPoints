@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33205.214
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpEndPointsApi", "HttpEndPointsApi\HttpEndPointsApi.csproj", "{8198E3F2-25F4-40DD-AB2F-4D980F285B00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HttpEndPointsApi", "HttpEndPointsApi\HttpEndPointsApi.csproj", "{8198E3F2-25F4-40DD-AB2F-4D980F285B00}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "diffTesterWFA", "diffTesterWFA\diffTesterWFA.csproj", "{1A30AB48-F238-4266-8B9E-C61AD70F5888}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndPointUnitTest", "EndPointUnitTest\EndPointUnitTest.csproj", "{030F509C-7106-448C-AF2E-A1B0D764525C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{1A30AB48-F238-4266-8B9E-C61AD70F5888}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1A30AB48-F238-4266-8B9E-C61AD70F5888}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1A30AB48-F238-4266-8B9E-C61AD70F5888}.Release|Any CPU.Build.0 = Release|Any CPU
+		{030F509C-7106-448C-AF2E-A1B0D764525C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{030F509C-7106-448C-AF2E-A1B0D764525C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{030F509C-7106-448C-AF2E-A1B0D764525C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{030F509C-7106-448C-AF2E-A1B0D764525C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
